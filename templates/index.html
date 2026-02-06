@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KML Polygon Counter</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <h1>KML Polygon Counter</h1>
+        <p>Upload a KML polygon file and a CSV of lat/long points to get counts per polygon.</p>
+      </header>
+
+      <main class="card">
+        {% if error %}
+        <div class="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="/process" enctype="multipart/form-data" class="form">
+          <label class="field">
+            <span>KML polygons</span>
+            <input type="file" name="kml_file" accept=".kml" required />
+          </label>
+
+          <label class="field">
+            <span>CSV points</span>
+            <input type="file" name="csv_file" accept=".csv" required />
+          </label>
+
+          <div class="grid">
+            <label class="field">
+              <span>Latitude column</span>
+              <input type="text" name="lat_col" value="LAT" />
+            </label>
+
+            <label class="field">
+              <span>Longitude column</span>
+              <input type="text" name="lon_col" value="LON" />
+            </label>
+
+            <label class="field">
+              <span>Weight column (optional)</span>
+              <input type="text" name="weight_col" value="FF" />
+            </label>
+          </div>
+
+          <button type="submit">Process Files</button>
+        </form>
+      </main>
+    </div>
+  </body>
+</html>

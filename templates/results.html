@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Results - KML Polygon Counter</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <h1>Results</h1>
+        <p>Processed {{ point_count }} points. Heatmap shows all points.</p>
+      </header>
+
+      <section class="card">
+        <div class="actions">
+          <a class="button" href="/download/{{ run_id }}.csv">Download CSV</a>
+          <a class="button secondary" href="/">Process Another</a>
+        </div>
+
+        <div id="map" class="map"></div>
+      </section>
+
+      <section class="card">
+        <h2>Weight Share (Pie)</h2>
+        <canvas id="pie" class="pie"></canvas>
+      </section>
+
+      <section class="card">
+        <h2>Counts by Polygon</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Polygon</th>
+                <th>Count</th>
+                <th>Weight Sum</th>
+                <th>Weight %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in results %}
+              <tr>
+                <td>{{ row.polygon }}</td>
+                <td>{{ row.count }}</td>
+                <td>{{ row.weight_sum }}</td>
+                <td>{{ row.weight_percent }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script>
+      window.__RUN_ID__ = "{{ run_id }}";
+      window.__RESULTS__ = {{ results | tojson }};
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
