@@ -7,6 +7,7 @@ import os
 import tempfile
 import uuid
 import xml.etree.ElementTree as ET
+import zipfile
 from typing import Dict, List, Optional, Tuple
 
 from flask import (
@@ -78,6 +79,19 @@ def parse_kml_polygons(kml_path: str):
         })
 
     return polygons
+
+
+def extract_kml_from_kmz(kmz_path: str, workdir: str) -> str:
+    with zipfile.ZipFile(kmz_path, "r") as zf:
+        kml_candidates = [n for n in zf.namelist() if n.lower().endswith(".kml")]
+        if not kml_candidates:
+            raise ValueError("KMZ does not contain a KML file.")
+        # Prefer standard doc.kml if present
+        kml_name = "doc.kml" if "doc.kml" in kml_candidates else kml_candidates[0]
+        out_path = os.path.join(workdir, "extracted.kml")
+        with zf.open(kml_name) as src, open(out_path, "wb") as dst:
+            dst.write(src.read())
+    return out_path
 
 
 def point_in_ring(point: Point, ring: Ring) -> bool:
@@ -195,7 +209,11 @@ def process():
     kml_file.save(kml_path)
     csv_file.save(csv_path)
 
-    polygons = parse_kml_polygons(kml_path)
+    kml_source = kml_path
+    if kml_file.filename and kml_file.filename.lower().endswith(".kmz"):
+        kml_source = extract_kml_from_kmz(kml_path, workdir)
+
+    polygons = parse_kml_polygons(kml_source)
     if not polygons:
         return render_template("index.html", error="No polygons found in KML."), 400
 
